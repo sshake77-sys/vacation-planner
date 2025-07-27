@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vacation Planner</title>
   <style>
     body {
@@ -18,9 +18,12 @@
       background: white;
       border-radius: 10px;
       min-height: 300px;
+      overflow-y: auto;
+      max-height: 400px;
     }
     .bot, .user {
       margin: 10px 0;
+      line-height: 1.4;
     }
     .bot {
       color: #333;
@@ -38,33 +41,71 @@
       color: white;
       cursor: pointer;
     }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #aaa;
+    .bot button:hover {
+      background-color: #005fa3;
     }
   </style>
 </head>
 <body>
   <h2>🌴 Vacation Planner Assistant</h2>
   <div id="chatbox"></div>
-  <input type="text" id="userInput" placeholder="Type your response and press Enter..." />
 
   <script>
     const chatbox = document.getElementById('chatbox');
-    const userInput = document.getElementById('userInput');
+
+    const destinations = {
+      "Asia": {
+        "Beach": ["Bali (Indonesia)", "Phuket (Thailand)", "Goa (India)"],
+        "Adventure": ["Pokhara (Nepal)", "Chiang Mai (Thailand)", "Hokkaido (Japan)"],
+        "Relaxing": ["Ubud (Indonesia)", "Langkawi (Malaysia)", "Kandy (Sri Lanka)"],
+        "Cultural": ["Kyoto (Japan)", "Jaipur (India)", "Hanoi (Vietnam)"]
+      },
+      "Europe": {
+        "Beach": ["Amalfi Coast (Italy)", "Santorini (Greece)", "Nice (France)"],
+        "Adventure": ["Interlaken (Switzerland)", "Dolomites (Italy)", "Iceland"],
+        "Relaxing": ["Provence (France)", "Lake Como (Italy)", "Barcelona (Spain)"],
+        "Cultural": ["Paris (France)", "Rome (Italy)", "Prague (Czech Republic)"]
+      },
+      "Africa": {
+        "Beach": ["Zanzibar (Tanzania)", "Cape Verde", "Diani Beach (Kenya)"],
+        "Adventure": ["Victoria Falls", "Mount Kilimanjaro", "Sahara Desert Trek"],
+        "Relaxing": ["Mauritius", "Seychelles", "Garden Route (South Africa)"],
+        "Cultural": ["Marrakech (Morocco)", "Cairo (Egypt)", "Lalibela (Ethiopia)"]
+      },
+      "North America": {
+        "Beach": ["Cancun (Mexico)", "Miami (USA)", "Bahamas"],
+        "Adventure": ["Grand Canyon", "Yosemite", "Banff (Canada)"],
+        "Relaxing": ["Napa Valley", "Hawaii", "Sedona"],
+        "Cultural": ["New Orleans", "Mexico City", "Washington D.C."]
+      },
+      "South America": {
+        "Beach": ["Rio de Janeiro", "Cartagena (Colombia)", "Buzios (Brazil)"],
+        "Adventure": ["Machu Picchu (Peru)", "Patagonia", "Amazon Rainforest"],
+        "Relaxing": ["Medellín (Colombia)", "Valparaiso (Chile)", "Quito (Ecuador)"],
+        "Cultural": ["Cusco (Peru)", "Buenos Aires (Argentina)", "Salvador (Brazil)"]
+      },
+      "Australia": {
+        "Beach": ["Bondi Beach (Australia)", "Fiji", "Whitehaven Beach"],
+        "Adventure": ["Queenstown (NZ)", "Tasmania", "Great Barrier Reef"],
+        "Relaxing": ["Gold Coast", "Byron Bay", "Rotorua (NZ)"],
+        "Cultural": ["Sydney", "Melbourne", "Wellington"]
+      }
+    };
+
+    let userSelection = {
+      continent: "",
+      tripType: ""
+    };
 
     function addMessage(sender, message) {
       const div = document.createElement('div');
       div.className = sender;
-      div.innerHTML = message;
+      div.textContent = message;
       chatbox.appendChild(div);
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    function addOptions(options, callback) {
+    function addOptions(options, onSelect) {
       const container = document.createElement('div');
       container.className = 'bot';
       options.forEach(option => {
@@ -72,7 +113,8 @@
         btn.textContent = option;
         btn.onclick = () => {
           addMessage('user', option);
-          callback(option);
+          onSelect(option);
+          container.remove(); // remove buttons after choice
         };
         container.appendChild(btn);
       });
@@ -80,59 +122,43 @@
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    let answers = {};
-    let step = 0;
-
-    const steps = [
-      () => addMessage('bot', "Hi! I'm your vacation planning assistant 👋. Ready to plan your next adventure?"),
-      () => addOptions(["Beach", "Adventure", "Relaxing", "Romantic", "Cultural", "Family"], handleTripType),
-    ];
-
-    function handleTripType(type) {
-      answers.type = type;
-      const suggestions = {
-        "Beach": ["Maldives", "Bali", "Cancun", "Phuket", "Maui"],
-        "Adventure": ["Patagonia", "Nepal", "New Zealand", "South Africa", "Peru"],
-        "Relaxing": ["Santorini", "Goa", "Costa Rica", "Tuscany", "Lake Como"],
-        "Romantic": ["Paris", "Kyoto", "Venice", "Bora Bora", "Prague"],
-        "Cultural": ["Istanbul", "Jaipur", "Rome", "Cairo", "Beijing"],
-        "Family": ["Orlando", "Dubai", "Singapore", "Barcelona", "Vancouver"]
-      };
-
-      addMessage('bot', `Here are some amazing ${type.toLowerCase()} destinations: <br><b>${suggestions[type].join(", ")}</b>`);
-      setTimeout(() => {
-        addMessage('bot', "What’s your travel budget?");
-        addOptions(["<$1000", "$1000–$3000", "$3000–$5000", "$5000+"], handleBudget);
-      }, 1000);
+    function askContinent() {
+      addMessage('bot', "🌍 Which continent would you like to visit?");
+      addOptions(Object.keys(destinations), continentChosen);
     }
 
-    function handleBudget(budget) {
-      answers.budget = budget;
-      addMessage('bot', "How many days are you planning for?");
-      addOptions(["Weekend", "1 Week", "2 Weeks", "Longer"], handleDuration);
+    function continentChosen(continent) {
+      userSelection.continent = continent;
+      addMessage('bot', `Great choice! You selected ${continent}.`);
+      askTripType();
     }
 
-    function handleDuration(duration) {
-      answers.duration = duration;
-      addMessage('bot', "Awesome! I’m putting together a plan...");
-      setTimeout(() => {
-        showSummary();
-      }, 1000);
+    function askTripType() {
+      addMessage('bot', "What kind of vacation are you planning?");
+      addOptions(["Beach", "Adventure", "Relaxing", "Cultural"], tripTypeChosen);
     }
 
-    function showSummary() {
-      addMessage('bot', `
-        ✅ Here's your vacation summary:<br>
-        • Type: <b>${answers.type}</b><br>
-        • Budget: <b>${answers.budget}</b><br>
-        • Duration: <b>${answers.duration}</b><br><br>
-        🌎 Safe travels! More features coming soon.
-      `);
+    function tripTypeChosen(type) {
+      userSelection.tripType = type;
+      showSuggestions();
     }
 
-    // Start conversation
-    steps[0]();
-    setTimeout(steps[1], 1000);
+    function showSuggestions() {
+      const {continent, tripType} = userSelection;
+      const places = destinations[continent]?.[tripType];
+
+      if (places && places.length > 0) {
+        addMessage('bot', `🌟 Based on your choice of a ${tripType} trip in ${continent}, here are some suggestions:`);
+        places.forEach(place => addMessage('bot', `• ${place}`));
+      } else {
+        addMessage('bot', "Sorry, no suggestions available for that combination.");
+      }
+      addMessage('bot', "Hope this helps! Feel free to refresh to plan another trip.");
+    }
+
+    // Start the conversation:
+    addMessage('bot', "Hi! I'm your Vacation Planner 👋 Let's get started.");
+    setTimeout(askContinent, 1000);
   </script>
 </body>
 </html>
