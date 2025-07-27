@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vacation Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #f5f8fa;
+    }
+    #chatbox {
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      min-height: 300px;
+    }
+    .bot, .user {
+      margin: 10px 0;
+    }
+    .bot {
+      color: #333;
+    }
+    .user {
+      text-align: right;
+      color: #0077cc;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h2>🌴 Vacation Planner Assistant</h2>
+  <div id="chatbox">
+    <div class="bot">Hi! I’m your Vacation Planner. Let’s plan your next trip. Ready?</div>
+  </div>
+  <input type="text" id="userInput" placeholder="Type your response and press Enter..." />
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('userInput');
+
+    const questions = [
+      "Where would you like to go (or type 'suggest' for ideas)?",
+      "When are you planning to travel?",
+      "How many people are traveling?",
+      "What’s your budget per person (USD)?",
+      "What kind of vacation do you prefer? (Adventure, Relaxing, Romantic, Family, Cultural)",
+      "Do you have a passport? (yes/no)"
+    ];
+
+    const answers = [];
+    let step = 0;
+
+    userInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        const userResponse = userInput.value.trim();
+        if (!userResponse) return;
+
+        // Show user message
+        const userDiv = document.createElement('div');
+        userDiv.className = 'user';
+        userDiv.textContent = userResponse;
+        chatbox.appendChild(userDiv);
+
+        answers.push(userResponse);
+        userInput.value = '';
+        step++;
+
+        if (step < questions.length) {
+          showBotMessage(questions[step]);
+        } else {
+          // Show vacation suggestions
+          showSummary();
+        }
+      }
+    });
+
+    function showBotMessage(message) {
+      const botDiv = document.createElement('div');
+      botDiv.className = 'bot';
+      botDiv.textContent = message;
+      chatbox.appendChild(botDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function showSummary() {
+      const botDiv = document.createElement('div');
+      botDiv.className = 'bot';
+      const [place, date, people, budget, type, passport] = answers;
+
+      let suggestions = '';
+      if (place.toLowerCase() === 'suggest') {
+        suggestions = "🗺️ Suggested destinations: Bali (Indonesia), Cancun (Mexico), Lisbon (Portugal)";
+      } else {
+        suggestions = `🌟 Here's a custom vacation plan for ${place}:\n- Travel Date: ${date}\n- Travelers: ${people}\n- Budget: $${budget} per person\n- Type: ${type}`;
+      }
+
+      botDiv.innerHTML = suggestions.replace(/\n/g, '<br>');
+      chatbox.appendChild(botDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    // Start with first question
+    showBotMessage(questions[0]);
+  </script>
+</body>
+</html>
