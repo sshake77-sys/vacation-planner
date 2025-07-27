@@ -186,4 +186,138 @@
         "Beach": [
           { name: "Bondi Beach (Australia)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-2179527" },
           { name: "Fiji", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-2318022" },
-          { name: "Whitehaven Beach", imageUrl: "https://images.unsplash.com/photo-1526481280699-
+          { name: "Whitehaven Beach", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-2179628" }
+        ],
+        "Adventure": [
+          { name: "Great Barrier Reef", imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d", bookingUrl: "https://www.booking.com/searchresults.html?city=-2179557" },
+          { name: "Tasmania", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-2163355" },
+          { name: "Blue Mountains", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-2155402" }
+        ],
+        "Relaxing": [
+          { name: "Melbourne", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-2158177" },
+          { name: "Byron Bay", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-2155522" },
+          { name: "Gold Coast", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-2147714" }
+        ],
+        "Cultural": [
+          { name: "Sydney", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-2147714" },
+          { name: "Canberra", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-2163355" },
+          { name: "Adelaide", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-2078025" }
+        ]
+      }
+    };
+
+    // Track conversation state
+    let chatStep = 0;
+    let userSelections = {
+      continent: null,
+      tripType: null,
+      budget: null,
+      duration: null
+    };
+
+    function addMessage(sender, message, isHTML = false) {
+      const div = document.createElement('div');
+      div.className = sender;
+      if (isHTML) {
+        div.innerHTML = message;
+      } else {
+        div.textContent = message;
+      }
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function addOptions(options) {
+      const container = document.createElement('div');
+      container.className = 'bot';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => handleUserInput(opt);
+        container.appendChild(btn);
+      });
+      chatbox.appendChild(container);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function handleUserInput(input) {
+      addMessage('user', input);
+
+      switch (chatStep) {
+        case 0:
+          userSelections.continent = input;
+          chatStep++;
+          askTripType();
+          break;
+        case 1:
+          userSelections.tripType = input;
+          chatStep++;
+          askBudget();
+          break;
+        case 2:
+          userSelections.budget = input;
+          chatStep++;
+          askDuration();
+          break;
+        case 3:
+          userSelections.duration = input;
+          chatStep++;
+          showSuggestions();
+          break;
+        default:
+          addMessage('bot', "Thanks for using Vacation Planner! Refresh the page to start over.");
+      }
+    }
+
+    function askContinent() {
+      addMessage('bot', "Which continent would you like to travel to?");
+      addOptions(Object.keys(destinations));
+    }
+
+    function askTripType() {
+      addMessage('bot', "What type of vacation are you planning?");
+      addOptions(["Beach", "Adventure", "Relaxing", "Cultural"]);
+    }
+
+    function askBudget() {
+      addMessage('bot', "Great! What's your travel budget?");
+      addOptions(["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
+    }
+
+    function askDuration() {
+      addMessage('bot', "How many days are you planning for?");
+      addOptions(["Weekend", "1 Week", "2 Weeks", "Longer"]);
+    }
+
+    function showSuggestions() {
+      const { continent, tripType } = userSelections;
+      const possibleDestinations = (destinations[continent] && destinations[continent][tripType]) || [];
+
+      if (possibleDestinations.length === 0) {
+        addMessage('bot', `Sorry, no suggestions available for ${tripType} trips in ${continent}.`);
+        return;
+      }
+
+      addMessage('bot', `<strong>Here are some ${tripType} destinations in ${continent} you might like:</strong>`, true);
+
+      possibleDestinations.forEach(dest => {
+        const destHtml = `
+          <div class="destination">
+            <strong>${dest.name}</strong><br/>
+            <img src="${dest.imageUrl}?auto=format&fit=crop&w=300&q=80" alt="${dest.name}" />
+            <br/>
+            <a href="${dest.bookingUrl}" target="_blank" rel="noopener noreferrer">Book Now</a>
+          </div>
+        `;
+        addMessage('bot', destHtml, true);
+      });
+
+      addMessage('bot', "Thank you for using Vacation Planner! Refresh the page to start a new plan.");
+    }
+
+    // Start conversation
+    addMessage('bot', "Hi! I'm your vacation planning assistant 👋. Let's plan your next trip!");
+    askContinent();
+  </script>
+</body>
+</html>
