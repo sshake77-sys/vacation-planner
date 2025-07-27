@@ -115,106 +115,75 @@
           { name: "Rome (Italy)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-1180491" },
           { name: "Prague (Czech Republic)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-3067696" }
         ]
-      }
-      // You can add other continents similarly...
-    };
-
-    let userSelection = {
-      continent: "",
-      tripType: ""
-    };
-
-    // Replace 'YOUR_OPENWEATHERMAP_API_KEY' with your actual API key from https://openweathermap.org/api
-    const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY';
-
-    function addMessage(sender, message) {
-      const div = document.createElement('div');
-      div.className = sender;
-      div.innerHTML = message;
-      chatbox.appendChild(div);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    function addOptions(options, onSelect) {
-      const container = document.createElement('div');
-      container.className = 'bot';
-      options.forEach(option => {
-        const btn = document.createElement('button');
-        btn.textContent = option;
-        btn.onclick = () => {
-          addMessage('user', option);
-          onSelect(option);
-          container.remove();
-        };
-        container.appendChild(btn);
-      });
-      chatbox.appendChild(container);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    async function getWeather(city) {
-      try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${OPENWEATHER_API_KEY}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Weather data not found');
-        const data = await res.json();
-        return `${data.weather[0].description}, ${data.main.temp}°C`;
-      } catch {
-        return 'Weather info unavailable';
-      }
-    }
-
-    async function showSuggestions() {
-      const { continent, tripType } = userSelection;
-      const places = destinations[continent]?.[tripType];
-
-      if (places && places.length > 0) {
-        addMessage('bot', `🌟 Based on your choice of a <b>${tripType}</b> trip in <b>${continent}</b>, here are some suggestions:`);
-
-        for (const place of places) {
-          const weather = await getWeather(place.name.split('(')[0].trim());
-
-          const container = document.createElement('div');
-          container.className = 'bot destination';
-          container.innerHTML = `
-            <h4>${place.name}</h4>
-            <img src="${place.imageUrl}?auto=format&fit=crop&w=300&q=80" alt="${place.name}">
-            <p><strong>Current Weather:</strong> ${weather}</p>
-            <p><a href="${place.bookingUrl}" target="_blank" rel="noopener noreferrer">Book your trip here</a></p>
-          `;
-          chatbox.appendChild(container);
-          chatbox.scrollTop = chatbox.scrollHeight;
-        }
-      } else {
-        addMessage('bot', "Sorry, no suggestions available for that combination.");
-      }
-      addMessage('bot', "Hope this helps! Refresh to plan another trip.");
-    }
-
-    function askContinent() {
-      addMessage('bot', "🌍 Which continent would you like to visit?");
-      addOptions(Object.keys(destinations), continentChosen);
-    }
-
-    function continentChosen(continent) {
-      userSelection.continent = continent;
-      addMessage('bot', `Great choice! You selected <b>${continent}</b>.`);
-      askTripType();
-    }
-
-    function askTripType() {
-      addMessage('bot', "What kind of vacation are you planning?");
-      addOptions(["Beach", "Adventure", "Relaxing", "Cultural"], tripTypeChosen);
-    }
-
-    function tripTypeChosen(type) {
-      userSelection.tripType = type;
-      showSuggestions();
-    }
-
-    // Start the chat
-    addMessage('bot', "Hi! I'm your Vacation Planner 👋 Let's get started.");
-    setTimeout(askContinent, 1000);
-  </script>
-</body>
-</html>
+      },
+      "Africa": {
+        "Beach": [
+          { name: "Zanzibar (Tanzania)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-889176" },
+          { name: "Cape Verde", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-897131" },
+          { name: "Diani Beach (Kenya)", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-186598" }
+        ],
+        "Adventure": [
+          { name: "Victoria Falls", imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d", bookingUrl: "https://www.booking.com/searchresults.html?city=-850955" },
+          { name: "Mount Kilimanjaro", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-874442" },
+          { name: "Sahara Desert Trek", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-224" }
+        ],
+        "Relaxing": [
+          { name: "Mauritius", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-934154" },
+          { name: "Seychelles", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-241" },
+          { name: "Garden Route (South Africa)", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-993800" }
+        ],
+        "Cultural": [
+          { name: "Marrakech (Morocco)", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-1099805" },
+          { name: "Cairo (Egypt)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-3064583" },
+          { name: "Lalibela (Ethiopia)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-344979" }
+        ]
+      },
+      "North America": {
+        "Beach": [
+          { name: "Cancun (Mexico)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-4671654" },
+          { name: "Miami (USA)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-4164138" },
+          { name: "Bahamas", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-35707" }
+        ],
+        "Adventure": [
+          { name: "Grand Canyon", imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d", bookingUrl: "https://www.booking.com/searchresults.html?city=-5495438" },
+          { name: "Yosemite", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-5940584" },
+          { name: "Banff (Canada)", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-6085495" }
+        ],
+        "Relaxing": [
+          { name: "Napa Valley", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-5119462" },
+          { name: "Hawaii", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-5856199" },
+          { name: "Sedona", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-5505217" }
+        ],
+        "Cultural": [
+          { name: "New Orleans", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-1697058" },
+          { name: "Mexico City", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-3530597" },
+          { name: "Washington D.C.", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-4138106" }
+        ]
+      },
+      "South America": {
+        "Beach": [
+          { name: "Rio de Janeiro", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-3451190" },
+          { name: "Cartagena (Colombia)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-8233440" },
+          { name: "Buzios (Brazil)", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-3451189" }
+        ],
+        "Adventure": [
+          { name: "Machu Picchu (Peru)", imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d", bookingUrl: "https://www.booking.com/searchresults.html?city=-3942736" },
+          { name: "Patagonia", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-3862636" },
+          { name: "Amazon Rainforest", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-3653317" }
+        ],
+        "Relaxing": [
+          { name: "Medellín (Colombia)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-3687925" },
+          { name: "Valparaiso (Chile)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-3879507" },
+          { name: "Quito (Ecuador)", imageUrl: "https://images.unsplash.com/photo-1526481280699-9a9d2a42f6cc", bookingUrl: "https://www.booking.com/searchresults.html?city=-3858919" }
+        ],
+        "Cultural": [
+          { name: "Cusco (Peru)", imageUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba", bookingUrl: "https://www.booking.com/searchresults.html?city=-3942759" },
+          { name: "Buenos Aires (Argentina)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-3435910" },
+          { name: "Salvador (Brazil)", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-3467664" }
+        ]
+      },
+      "Australia": {
+        "Beach": [
+          { name: "Bondi Beach (Australia)", imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", bookingUrl: "https://www.booking.com/searchresults.html?city=-2179527" },
+          { name: "Fiji", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", bookingUrl: "https://www.booking.com/searchresults.html?city=-2318022" },
+          { name: "Whitehaven Beach", imageUrl: "https://images.unsplash.com/photo-1526481280699-
