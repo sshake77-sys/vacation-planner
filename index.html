@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vacation Planner for you</title>
+  <title>Vacation Planner</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,3 +115,85 @@
   </script>
 </body>
 </html>
+
+<script>
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+
+  let step = 0;
+  const userData = {};
+
+  function botResponse(text) {
+    const message = document.createElement("div");
+    message.className = "message bot";
+    message.innerText = text;
+    chat.appendChild(message);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function userResponse(text) {
+    const message = document.createElement("div");
+    message.className = "message user";
+    message.innerText = text;
+    chat.appendChild(message);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function handleUserInput() {
+    const inputText = input.value.trim();
+    if (!inputText) return;
+
+    userResponse(inputText);
+    input.value = "";
+
+    switch (step) {
+      case 0:
+        userData.type = inputText.toLowerCase();
+        botResponse("Great! What's your approximate budget for this trip (e.g., $1000, $3000)?");
+        step++;
+        break;
+      case 1:
+        userData.budget = inputText;
+        botResponse("Awesome. When are you planning to travel? (e.g., August, December)");
+        step++;
+        break;
+      case 2:
+        userData.month = inputText;
+        suggestTrip();
+        step++;
+        break;
+      default:
+        botResponse("Would you like to plan another trip? Refresh the page to restart.");
+    }
+  }
+
+  function suggestTrip() {
+    const { type, budget, month } = userData;
+    let suggestion = "Here's a suggestion for you: ";
+
+    if (type.includes("beach")) {
+      suggestion += `Consider visiting Bali or Maldives in ${month}. `;
+    } else if (type.includes("adventure")) {
+      suggestion += `How about hiking in Patagonia or a safari in Kenya this ${month}? `;
+    } else if (type.includes("relax")) {
+      suggestion += `Try a wellness retreat in Sedona or Tuscany this ${month}. `;
+    } else if (type.includes("cultural")) {
+      suggestion += `Explore Kyoto, Japan or Rome, Italy in ${month}. `;
+    } else {
+      suggestion += `Try exploring destinations on TripAdvisor based on your preferences. `;
+    }
+
+    suggestion += `We'll try to stay within a budget of ${budget}.`;
+
+    botResponse(suggestion);
+  }
+
+  sendBtn.addEventListener("click", handleUserInput);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") handleUserInput();
+  });
+
+  // Kick off the bot
+  botResponse("Hi! I'm your vacation planning assistant. What type of vacation are you planning? (e.g., Beach, Adventure, Relaxing, Cultural)");
+</script>
