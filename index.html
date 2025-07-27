@@ -84,26 +84,33 @@
       if (!window.chatStep) window.chatStep = 1;
 
       switch (window.chatStep) {
-        case 1:
-          botResponse("What type of vacation are you planning?", ["Beach", "Adventure", "Relaxing", "Cultural"]);
-          window.chatStep++;
-          break;
-        case 2:
-          botResponse("Great choice! What's your travel budget?", ["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
-          window.chatStep++;
-          break;
-        case 3:
-          botResponse("How many days are you planning for?", ["Weekend", "1 Week", "2 Weeks", "Longer"]);
-          window.chatStep++;
-          break;
-        case 4:
-          botResponse("Awesome! I’m putting together a plan. You’ll soon be able to view personalized vacation options here.");
-          window.chatStep++;
-          break;
-        default:
-          botResponse("I’ll keep improving soon. Thanks for trying the Vacation Planner!");
-          break;
-      }
+  case 1:
+    window.tripType = input;  // Save trip type
+    botResponse("Great choice! What's your travel budget?", ["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
+    window.chatStep++;
+    break;
+  case 2:
+    window.budget = input;  // Save budget
+    botResponse("How many days are you planning for?", ["Weekend", "1 Week", "2 Weeks", "Longer"]);
+    window.chatStep++;
+    break;
+  case 3:
+    window.duration = input; // Save duration
+    // Suggest destinations based on trip type
+    const suggestions = {
+      Beach: ["🏝️ Maldives", "🇲🇽 Cancun", "🇹🇭 Phuket"],
+      Adventure: ["🇳🇿 Queenstown", "🇵🇪 Machu Picchu", "🇳🇵 Himalayas"],
+      Relaxing: ["🇮🇹 Amalfi Coast", "🇯🇵 Kyoto", "🇬🇷 Santorini"],
+      Cultural: ["🇮🇳 Jaipur", "🇪🇬 Cairo", "🇫🇷 Paris"]
+    };
+    const picked = suggestions[window.tripType] || ["🌍 Bali", "🇵🇹 Lisbon", "🇹🇷 Istanbul"];
+    botResponse(`Based on your preference for a ${window.tripType} vacation, here are some top destinations:\n- ${picked.join('\n- ')}`);
+    window.chatStep++;
+    break;
+  default:
+    botResponse("Hope this helped you plan better. I'll be adding more features soon!");
+    break;
+}
     }
 
     // Start the conversation
