@@ -19,7 +19,7 @@
       border-radius: 10px;
       min-height: 300px;
     }
-    .bot, .user {
+    .message {
       margin: 10px 0;
     }
     .bot {
@@ -29,152 +29,85 @@
       text-align: right;
       color: #0077cc;
     }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
+    button {
+      margin: 5px 5px 0 0;
+      padding: 8px 12px;
+      border: none;
+      background-color: #0077cc;
+      color: white;
       border-radius: 5px;
-      border: 1px solid #aaa;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
     }
   </style>
 </head>
 <body>
   <h2>🌴 Vacation Planner Assistant</h2>
-  <div id="chatbox">
-    <div class="bot">Hi! I’m your Vacation Planner. Let’s plan your next trip. Ready?</div>
-  </div>
-  <input type="text" id="userInput" placeholder="Type your response and press Enter..." />
+  <div id="chatbox"></div>
 
   <script>
-    const chatbox = document.getElementById('chatbox');
-    const userInput = document.getElementById('userInput');
+    const chatbox = document.getElementById("chatbox");
 
-    const questions = [
-      "Where would you like to go (or type 'suggest' for ideas)?",
-      "When are you planning to travel?",
-      "How many people are traveling?",
-      "What’s your budget per person (USD)?",
-      "What kind of vacation do you prefer? (Adventure, Relaxing, Romantic, Family, Cultural)",
-      "Do you have a passport? (yes/no)"
-    ];
-
-    const answers = [];
-    let step = 0;
-
-    userInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        const userResponse = userInput.value.trim();
-        if (!userResponse) return;
-
-        // Show user message
-        const userDiv = document.createElement('div');
-        userDiv.className = 'user';
-        userDiv.textContent = userResponse;
-        chatbox.appendChild(userDiv);
-
-        answers.push(userResponse);
-        userInput.value = '';
-        step++;
-
-        if (step < questions.length) {
-          showBotMessage(questions[step]);
-        } else {
-          // Show vacation suggestions
-          showSummary();
-        }
-      }
-    });
-
-    function showBotMessage(message) {
-      const botDiv = document.createElement('div');
-      botDiv.className = 'bot';
-      botDiv.textContent = message;
-      chatbox.appendChild(botDiv);
+    function addMessage(sender, message) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      messageDiv.textContent = message;
+      chatbox.appendChild(messageDiv);
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    function showSummary() {
-      const botDiv = document.createElement('div');
-      botDiv.className = 'bot';
-      const [place, date, people, budget, type, passport] = answers;
-
-      let suggestions = '';
-      if (place.toLowerCase() === 'suggest') {
-        suggestions = "🗺️ Suggested destinations: Bali (Indonesia), Cancun (Mexico), Lisbon (Portugal)";
-      } else {
-        suggestions = `🌟 Here's a custom vacation plan for ${place}:\n- Travel Date: ${date}\n- Travelers: ${people}\n- Budget: $${budget} per person\n- Type: ${type}`;
-      }
-
-      botDiv.innerHTML = suggestions.replace(/\n/g, '<br>');
-      chatbox.appendChild(botDiv);
+    function addOptions(options) {
+      const container = document.createElement("div");
+      container.className = "message bot";
+      options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.onclick = () => handleUserInput(option);
+        container.appendChild(button);
+      });
+      chatbox.appendChild(container);
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    // Start with first question
-    showBotMessage(questions[0]);
+    function botResponse(message, options = []) {
+      addMessage("bot", message);
+      if (options.length > 0) {
+        addOptions(options);
+      }
+    }
+
+    function handleUserInput(input) {
+      addMessage("user", input);
+
+      if (!window.chatStep) window.chatStep = 1;
+
+      switch (window.chatStep) {
+        case 1:
+          botResponse("What type of vacation are you planning?", ["Beach", "Adventure", "Relaxing", "Cultural"]);
+          window.chatStep++;
+          break;
+        case 2:
+          botResponse("Great choice! What's your travel budget?", ["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
+          window.chatStep++;
+          break;
+        case 3:
+          botResponse("How many days are you planning for?", ["Weekend", "1 Week", "2 Weeks", "Longer"]);
+          window.chatStep++;
+          break;
+        case 4:
+          botResponse("Awesome! I’m putting together a plan. You’ll soon be able to view personalized vacation options here.");
+          window.chatStep++;
+          break;
+        default:
+          botResponse("I’ll keep improving soon. Thanks for trying the Vacation Planner!");
+          break;
+      }
+    }
+
+    // Start the conversation
+    botResponse("Hi! I'm your vacation planning assistant 👋. Let's plan your next trip!", ["Let's go have fun!"]);
   </script>
 </body>
 </html>
-
-<script>
-  const chatbox = document.getElementById("chatbox");
-
-  function addMessage(sender, message) {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = `message ${sender}`;
-    messageDiv.textContent = message;
-    chatbox.appendChild(messageDiv);
-    chatbox.scrollTop = chatbox.scrollHeight;
-  }
-
-  function addOptions(options) {
-    const container = document.createElement("div");
-    container.className = "message bot";
-    options.forEach(option => {
-      const button = document.createElement("button");
-      button.textContent = option;
-      button.onclick = () => handleUserInput(option);
-      container.appendChild(button);
-    });
-    chatbox.appendChild(container);
-    chatbox.scrollTop = chatbox.scrollHeight;
-  }
-
-  function botResponse(message, options = []) {
-    addMessage("bot", message);
-    if (options.length > 0) {
-      addOptions(options);
-    }
-  }
-
-  function handleUserInput(input) {
-    addMessage("user", input);
-
-    if (!window.chatStep) window.chatStep = 1;
-
-    switch (window.chatStep) {
-      case 1:
-        botResponse("What type of vacation are you planning?", ["Beach", "Adventure", "Relaxing", "Cultural"]);
-        window.chatStep++;
-        break;
-      case 2:
-        botResponse("Great choice! What's your travel budget?", ["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
-        window.chatStep++;
-        break;
-      case 3:
-        botResponse("How many days are you planning for?", ["Weekend", "1 Week", "2 Weeks", "Longer"]);
-        window.chatStep++;
-        break;
-      case 4:
-        botResponse("Awesome! I’m putting together a plan. You’ll soon be able to view personalized vacation options here.");
-        window.chatStep++;
-        break;
-      default:
-        botResponse("I’ll keep improving soon. Thanks for trying the Vacation Planner!");
-        break;
-    }
-  }
-
-  // Start the conversation
-  botResponse("Hi! I'm your vacation planning assistant 👋. Let's plan your next trip!", ["Let's go have fun!"]);
-</script>
