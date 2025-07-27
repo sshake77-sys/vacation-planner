@@ -117,83 +117,64 @@
 </html>
 
 <script>
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("user-input");
-  const sendBtn = document.getElementById("send-btn");
+  const chatbox = document.getElementById("chatbox");
 
-  let step = 0;
-  const userData = {};
-
-  function botResponse(text) {
-    const message = document.createElement("div");
-    message.className = "message bot";
-    message.innerText = text;
-    chat.appendChild(message);
-    chat.scrollTop = chat.scrollHeight;
+  function addMessage(sender, message) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${sender}`;
+    messageDiv.textContent = message;
+    chatbox.appendChild(messageDiv);
+    chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  function userResponse(text) {
-    const message = document.createElement("div");
-    message.className = "message user";
-    message.innerText = text;
-    chat.appendChild(message);
-    chat.scrollTop = chat.scrollHeight;
+  function addOptions(options) {
+    const container = document.createElement("div");
+    container.className = "message bot";
+    options.forEach(option => {
+      const button = document.createElement("button");
+      button.textContent = option;
+      button.onclick = () => handleUserInput(option);
+      container.appendChild(button);
+    });
+    chatbox.appendChild(container);
+    chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  function handleUserInput() {
-    const inputText = input.value.trim();
-    if (!inputText) return;
+  function botResponse(message, options = []) {
+    addMessage("bot", message);
+    if (options.length > 0) {
+      addOptions(options);
+    }
+  }
 
-    userResponse(inputText);
-    input.value = "";
+  function handleUserInput(input) {
+    addMessage("user", input);
 
-    switch (step) {
-      case 0:
-        userData.type = inputText.toLowerCase();
-        botResponse("Great! What's your approximate budget for this trip (e.g., $1000, $3000)?");
-        step++;
-        break;
+    if (!window.chatStep) window.chatStep = 1;
+
+    switch (window.chatStep) {
       case 1:
-        userData.budget = inputText;
-        botResponse("Awesome. When are you planning to travel? (e.g., August, December)");
-        step++;
+        botResponse("What type of vacation are you planning?", ["Beach", "Adventure", "Relaxing", "Cultural"]);
+        window.chatStep++;
         break;
       case 2:
-        userData.month = inputText;
-        suggestTrip();
-        step++;
+        botResponse("Great choice! What's your travel budget?", ["<$1000", "$1000-$3000", "$3000-$5000", "$5000+"]);
+        window.chatStep++;
+        break;
+      case 3:
+        botResponse("How many days are you planning for?", ["Weekend", "1 Week", "2 Weeks", "Longer"]);
+        window.chatStep++;
+        break;
+      case 4:
+        botResponse("Awesome! I’m putting together a plan. You’ll soon be able to view personalized vacation options here.");
+        window.chatStep++;
         break;
       default:
-        botResponse("Would you like to plan another trip? Refresh the page to restart.");
+        botResponse("I’ll keep improving soon. Thanks for trying the Vacation Planner!");
+        break;
     }
   }
 
-  function suggestTrip() {
-    const { type, budget, month } = userData;
-    let suggestion = "Here's a suggestion for you: ";
-
-    if (type.includes("beach")) {
-      suggestion += `Consider visiting Bali or Maldives in ${month}. `;
-    } else if (type.includes("adventure")) {
-      suggestion += `How about hiking in Patagonia or a safari in Kenya this ${month}? `;
-    } else if (type.includes("relax")) {
-      suggestion += `Try a wellness retreat in Sedona or Tuscany this ${month}. `;
-    } else if (type.includes("cultural")) {
-      suggestion += `Explore Kyoto, Japan or Rome, Italy in ${month}. `;
-    } else {
-      suggestion += `Try exploring destinations on TripAdvisor based on your preferences. `;
-    }
-
-    suggestion += `We'll try to stay within a budget of ${budget}.`;
-
-    botResponse(suggestion);
-  }
-
-  sendBtn.addEventListener("click", handleUserInput);
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") handleUserInput();
-  });
-
-  // Kick off the bot
-  botResponse("Hi! I'm your vacation planning assistant. What type of vacation are you planning? (e.g., Beach, Adventure, Relaxing, Cultural)");
+  // Start the conversation
+  botResponse("Hi! I'm your vacation planning assistant 👋. Let's plan your next trip!", ["Let's go!"]);
 </script>
