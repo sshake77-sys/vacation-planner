@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/vacation-planner/static/css/main.e6c13ad2.css",
+    "main.js": "/vacation-planner/static/js/main.366f423a.js",
+    "static/js/453.69c2b73e.chunk.js": "/vacation-planner/static/js/453.69c2b73e.chunk.js",
+    "index.html": "/vacation-planner/index.html",
+    "main.e6c13ad2.css.map": "/vacation-planner/static/css/main.e6c13ad2.css.map",
+    "main.366f423a.js.map": "/vacation-planner/static/js/main.366f423a.js.map",
+    "453.69c2b73e.chunk.js.map": "/vacation-planner/static/js/453.69c2b73e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.366f423a.js"
+  ]
+}
